@@ -1,17 +1,25 @@
 #include "texture.hpp"
+#include "engine.hpp"
 #include <SDL3_image/SDL_image.h>
 
 namespace Engine
 {
-    Texture::Texture(SDL_Renderer *renderer, const std::string &filePath)
-        : renderer_(renderer), texture_(nullptr), width_(0), height_(0)
+    Texture::Texture(Renderer &renderer, const std::string &filePath)
+        : renderer_(renderer), texture_(nullptr), x_(0), y_(0), scaleX_(1.0f), scaleY_(1.0f), rotation_(0.0f), flip_(SDL_FLIP_NONE)
     {
-        if (!renderer_)
+        SDL_Surface *surface = IMG_Load(filePath.c_str());
+        if (!surface)
         {
-            throw std::invalid_argument("Renderer cannot be null.");
+            throw std::runtime_error("Failed to load image: " + std::string(SDL_GetError()));
         }
 
-        loadFromFile(filePath);
+        texture_ = SDL_CreateTextureFromSurface(renderer_.getHandle(), surface);
+        SDL_DestroySurface(surface);
+
+        if (!texture_)
+        {
+            throw std::runtime_error("Failed to create texture: " + std::string(SDL_GetError()));
+        }
     }
 
     Texture::~Texture()
@@ -27,34 +35,38 @@ namespace Engine
         return texture_;
     }
 
-    int Texture::getWidth() const
+    SDL_FRect Texture::getSrcRect() const
     {
-        return width_;
+        float width, height;
+        SDL_GetTextureSize(texture_, &width, &height);
+        return SDL_FRect{0, 0, width, height};
     }
 
-    int Texture::getHeight() const
+    void Texture::setPosition(float x, float y)
     {
-        return height_;
+        x_ = x;
+        y_ = y;
     }
 
-    void Texture::loadFromFile(const std::string &filePath)
+    void Texture::setScale(float scaleX, float scaleY)
     {
-        SDL_Surface *surface = IMG_Load(filePath.c_str());
-        if (!surface)
-        {
-            throw std::runtime_error("Failed to load image: " + std::string(SDL_GetError()));
-        }
+        scaleX_ = scaleX;
+        scaleY_ = scaleY;
+    }
 
-        texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
-        if (!texture_)
-        {
-            SDL_DestroySurface(surface);
-            throw std::runtime_error("Failed to create texture: " + std::string(SDL_GetError()));
-        }
+    void Texture::setRotation(float angle)
+    {
+        rotation_ = angle;
+    }
 
-        width_ = surface->w;
-        height_ = surface->h;
+    void Texture::setFlip(SDL_FlipMode flip)
+    {
+        flip_ = flip;
+    }
 
-        SDL_DestroySurface(surface);
+    void Texture::applyTransformations(SDL_FRect &destRect)
+    {
+        destRect.w *= scaleX_;
+        destRect.h *= scaleY_;
     }
 }

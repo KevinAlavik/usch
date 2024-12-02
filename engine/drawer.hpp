@@ -17,7 +17,7 @@ namespace Engine
         void drawLine(const math::Vec2 &start, const math::Vec2 &end);
         void drawRect(const math::Vec2 &position, const math::Vec2 &size, bool filled = false);
         void drawCircle(const math::Vec2 &center, float radius, bool filled = false);
-        void drawTexture(const math::Vec2 &position, const Texture &texture);
+        void drawTexture(const math::Vec2 &position, Texture &texture);
 
     private:
         Renderer &renderer_;

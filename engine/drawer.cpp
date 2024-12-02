@@ -75,11 +75,14 @@ namespace Engine
         }
     }
 
-    void Drawer::drawTexture(const math::Vec2 &position, const Texture &texture)
+    void Drawer::drawTexture(const math::Vec2 &position, Texture &texture)
     {
-        SDL_FRect destRect = {position.x, position.y, static_cast<float>(texture.getWidth()), static_cast<float>(texture.getHeight())};
+        SDL_FRect sourceRect = texture.getSrcRect();
+        SDL_FRect destRect = {position.x, position.y, static_cast<float>(sourceRect.w), static_cast<float>(sourceRect.h)};
 
-        if (!SDL_RenderTexture(renderer_.getHandle(), texture.getHandle(), nullptr, &destRect))
+        texture.applyTransformations(destRect);
+
+        if (!SDL_RenderTextureRotated(renderer_.getHandle(), texture.getHandle(), &sourceRect, &destRect, texture.getRotation(), nullptr, texture.getFlip()))
         {
             throw std::runtime_error("Failed to draw texture: " + std::string(SDL_GetError()));
         }

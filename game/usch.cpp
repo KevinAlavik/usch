@@ -37,7 +37,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         engineDrawer = std::make_unique<Engine::Drawer>(*engineRenderer);
 
         // Load the test image
-        testTexture = std::make_unique<Engine::Texture>(engineRenderer.get()->getHandle(), "image.png");
+        testTexture = std::make_unique<Engine::Texture>(*engineRenderer, "image.png");
+        testTexture->setRotation(45.0f);
+        testTexture->setScale(0.5f, 0.5f);
 
         lastTime = SDL_GetTicks();
     }
@@ -81,8 +83,18 @@ SDL_AppResult SDL_AppIterate(void *appstate)
             fps = 1000.0f / delta;
         }
 
-        // Clear screen
-        engineRenderer->setDrawColor(state.bg_color);
+        // Shrinking and growing the texture over time
+        const float time = (float)currentTime / 1000.0f;
+        float scale = 0.5f + 0.5f * SDL_sin(time * 2.0f); // This will oscillate between 0 and 1
+        testTexture->setScale(scale, scale);
+        testTexture->setRotation(scale * 10);
+
+        // Animating the background color
+        const float red = 0.5f + 0.5f * SDL_sin(time);
+        const float green = 0.5f + 0.5f * SDL_sin(time + SDL_PI_D * 2 / 3);
+        const float blue = 0.5f + 0.5f * SDL_sin(time + SDL_PI_D * 4 / 3);
+
+        engineRenderer->setDrawColor(math::Vec4(red, green, blue, 1.0f));
         engineRenderer->clear();
 
         // Draw texture
