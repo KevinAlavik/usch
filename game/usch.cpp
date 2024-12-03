@@ -38,7 +38,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
         // Load the test image
         testTexture = std::make_unique<Engine::Texture>(*engineRenderer, "image.png");
-        testTexture->setRotation(45.0f);
         testTexture->setScale(0.5f, 0.5f);
 
         lastTime = SDL_GetTicks();
@@ -83,18 +82,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
             fps = 1000.0f / delta;
         }
 
-        // Shrinking and growing the texture over time
-        const float time = (float)currentTime / 1000.0f;
-        float scale = 0.5f + 0.5f * SDL_sin(time * 2.0f); // This will oscillate between 0 and 1
-        testTexture->setScale(scale, scale);
-        testTexture->setRotation(scale * 10);
-
-        // Animating the background color
-        const float red = 0.5f + 0.5f * SDL_sin(time);
-        const float green = 0.5f + 0.5f * SDL_sin(time + SDL_PI_D * 2 / 3);
-        const float blue = 0.5f + 0.5f * SDL_sin(time + SDL_PI_D * 4 / 3);
-
-        engineRenderer->setDrawColor(math::Vec4(red, green, blue, 1.0f));
+        engineRenderer->setDrawColor(state.bg_color);
         engineRenderer->clear();
 
         // Draw texture
@@ -106,10 +94,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         mouseText.precision(2);
         mouseText << std::fixed << "Mouse position: " << state.mouse_pos.x << ", " << state.mouse_pos.y;
         SDL_RenderDebugText(engineRenderer->getHandle(), 0, 10, mouseText.str().c_str());
-
-        // Draw a circle at the mouse position
-        engineDrawer->setColor(math::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        engineDrawer->drawCircle(state.mouse_pos, 100, true);
 
         // Draw debug text
         engineRenderer->setDrawColor(state.text_color);
