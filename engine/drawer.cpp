@@ -12,8 +12,8 @@ namespace Engine
 
     void Drawer::drawLine(const math::Vec2 &start, const math::Vec2 &end)
     {
-        if (SDL_RenderLine(renderer_.getHandle(), static_cast<int>(start.x), static_cast<int>(start.y),
-                           static_cast<int>(end.x), static_cast<int>(end.y)) != 0)
+        if (!SDL_RenderLine(renderer_.getHandle(), static_cast<int>(start.x), static_cast<int>(start.y),
+                            static_cast<int>(end.x), static_cast<int>(end.y)))
         {
             throw std::runtime_error("Failed to draw line: " + std::string(SDL_GetError()));
         }
@@ -24,14 +24,14 @@ namespace Engine
         SDL_FRect rect = {position.x, position.y, size.x, size.y};
         if (filled)
         {
-            if (SDL_RenderFillRect(renderer_.getHandle(), &rect) != 0)
+            if (!SDL_RenderFillRect(renderer_.getHandle(), &rect))
             {
                 throw std::runtime_error("Failed to draw filled rectangle: " + std::string(SDL_GetError()));
             }
         }
         else
         {
-            if (SDL_RenderRect(renderer_.getHandle(), &rect) != 0)
+            if (!SDL_RenderRect(renderer_.getHandle(), &rect))
             {
                 throw std::runtime_error("Failed to draw rectangle: " + std::string(SDL_GetError()));
             }
