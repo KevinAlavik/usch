@@ -1,9 +1,8 @@
-// math/vector.hpp
-
 #pragma once
 
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 namespace math
 {
@@ -42,6 +41,13 @@ namespace math
             return len != 0 ? Vec2(x / len, y / len) : Vec2(0, 0);
         }
 
+        Vec2 clamp(float minVal, float maxVal) const
+        {
+            return Vec2(
+                std::clamp(x, minVal, maxVal),
+                std::clamp(y, minVal, maxVal));
+        }
+
         friend std::ostream &operator<<(std::ostream &os, const Vec2 &v)
         {
             os << "(" << v.x << ", " << v.y << ")";
@@ -74,7 +80,10 @@ namespace math
 
         Vec3 cross(const Vec3 &other) const
         {
-            return Vec3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
+            return Vec3(
+                y * other.z - z * other.y,
+                z * other.x - x * other.z,
+                x * other.y - y * other.x);
         }
 
         float length() const
@@ -86,6 +95,14 @@ namespace math
         {
             float len = length();
             return len != 0 ? Vec3(x / len, y / len, z / len) : Vec3(0, 0, 0);
+        }
+
+        Vec3 clamp(float minVal, float maxVal) const
+        {
+            return Vec3(
+                std::clamp(x, minVal, maxVal),
+                std::clamp(y, minVal, maxVal),
+                std::clamp(z, minVal, maxVal));
         }
 
         friend std::ostream &operator<<(std::ostream &os, const Vec3 &v)
@@ -127,6 +144,15 @@ namespace math
         {
             float len = length();
             return len != 0 ? Vec4(x / len, y / len, z / len, w / len) : Vec4(0, 0, 0, 0);
+        }
+
+        Vec4 clamp(float minVal, float maxVal) const
+        {
+            return Vec4(
+                std::clamp(x, minVal, maxVal),
+                std::clamp(y, minVal, maxVal),
+                std::clamp(z, minVal, maxVal),
+                std::clamp(w, minVal, maxVal));
         }
 
         friend std::ostream &operator<<(std::ostream &os, const Vec4 &v)

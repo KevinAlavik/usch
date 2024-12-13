@@ -39,7 +39,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         // Load the test image
         testTexture = std::make_unique<Engine::Texture>(*engineRenderer, "image.png");
         testTexture->setScale(0.5f, 0.5f);
-
         lastTime = SDL_GetTicks();
     }
     catch (const std::exception &e)
@@ -85,15 +84,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         engineRenderer->setDrawColor(state.bg_color);
         engineRenderer->clear();
 
-        // Draw texture
+        testTexture->setRotation(static_cast<float>(SDL_GetTicks()) / 10.0f);
         engineDrawer->drawTexture(state.mouse_pos, *testTexture);
-
-        // Output mouse position
-        engineRenderer->setDrawColor(state.text_color);
-        std::ostringstream mouseText;
-        mouseText.precision(2);
-        mouseText << std::fixed << "Mouse position: " << state.mouse_pos.x << ", " << state.mouse_pos.y;
-        SDL_RenderDebugText(engineRenderer->getHandle(), 0, 10, mouseText.str().c_str());
 
         // Draw debug text
         engineRenderer->setDrawColor(state.text_color);
@@ -101,6 +93,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         debugText.precision(2);
         debugText << std::fixed << "FPS: " << fps;
         SDL_RenderDebugText(engineRenderer->getHandle(), 0, 0, debugText.str().c_str());
+
+        // Output mouse position
+        engineRenderer->setDrawColor(state.text_color);
+        std::ostringstream mouseText;
+        mouseText.precision(2);
+        mouseText << std::fixed << "Mouse position: " << state.mouse_pos.x << ", " << state.mouse_pos.y;
+        SDL_RenderDebugText(engineRenderer->getHandle(), 0, 10, mouseText.str().c_str());
 
         // Update screen buffer
         engineRenderer->present();
